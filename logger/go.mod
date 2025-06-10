@@ -1,4 +1,4 @@
-module git.is.ru/shanth1/go-common/logger
+module github.com/shanth1/go-common/logger
 
 go 1.23.1
 
