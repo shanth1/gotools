@@ -9,8 +9,6 @@ import (
 	"github.com/rs/zerolog"
 )
 
-// TODO: move to common repo
-
 type callerHook struct{}
 
 func (h callerHook) Run(e *zerolog.Event, level zerolog.Level, msg string) {
