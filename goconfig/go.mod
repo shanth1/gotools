@@ -1,4 +1,4 @@
-module github.com/shanth1/go-common/goconfig
+module github.com/shanth1/go-common/goconf
 
 go 1.23.1
 
