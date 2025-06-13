@@ -18,8 +18,12 @@ func (h callerHook) Run(e *zerolog.Event, level zerolog.Level, msg string) {
 }
 
 // GetLogger returns a custom zerolog logger
-func GetLogger(app string, level zerolog.Level, writers ...io.Writer) zerolog.Logger {
-	zerolog.SetGlobalLevel(level)
+func New(app, level string, writers ...io.Writer) zerolog.Logger {
+	zlevel, err := zerolog.ParseLevel(level)
+	if err != nil {
+		zlevel = zerolog.TraceLevel
+	}
+	zerolog.SetGlobalLevel(zlevel)
 
 	output := zerolog.ConsoleWriter{
 		Out:        os.Stdout,
@@ -33,6 +37,6 @@ func GetLogger(app string, level zerolog.Level, writers ...io.Writer) zerolog.Lo
 	return logger.Hook(callerHook{})
 }
 
-func GetLoggerFromCtx(ctx context.Context) *zerolog.Logger {
+func FromCtx(ctx context.Context) *zerolog.Logger {
 	return zerolog.Ctx(ctx)
 }
