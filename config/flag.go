@@ -1,4 +1,4 @@
-package goconf
+package config
 
 import (
 	"flag"
