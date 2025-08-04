@@ -49,7 +49,7 @@ func (h callerHook) Run(e *zerolog.Event, level zerolog.Level, msg string) {
 	}
 }
 
-func New(app string, level string, writers ...io.Writer) Logger {
+func New(service string, level string, writers ...io.Writer) Logger {
 	zlevel, err := zerolog.ParseLevel(strings.ToLower(level))
 	if err != nil {
 		zlevel = zerolog.InfoLevel
@@ -65,7 +65,7 @@ func New(app string, level string, writers ...io.Writer) Logger {
 
 	multi := zerolog.MultiLevelWriter(writers...)
 	zlog := zerolog.New(multi).With().
-		Str("app", app).
+		Str("service", service).
 		Timestamp().
 		Logger().
 		Hook(callerHook{})
