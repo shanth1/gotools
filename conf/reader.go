@@ -5,6 +5,7 @@ import (
 	"github.com/spf13/viper"
 )
 
+// Load loads the yaml config by accepting a path and a pointer to the structure
 func Load(path string, cfg interface{}) error {
 	v := viper.New()
 	v.SetConfigFile(path)
