@@ -2,10 +2,19 @@ package conf
 
 import (
 	"fmt"
+	"reflect"
+
 	"github.com/spf13/viper"
 )
 
-func Load(path string, cfg interface{}) error {
+// Load loads the yaml config by accepting a path and a pointer to the structure
+func Load(path string, cfgPtr interface{}) error {
+	val := reflect.ValueOf(cfgPtr)
+
+	if val.Kind() != reflect.Ptr || val.Elem().Kind() != reflect.Struct {
+		return fmt.Errorf("expected a pointer to a struct, but got %T", cfgPtr)
+	}
+
 	v := viper.New()
 	v.SetConfigFile(path)
 	v.SetConfigType("yaml")
@@ -13,7 +22,7 @@ func Load(path string, cfg interface{}) error {
 	if err := v.ReadInConfig(); err != nil {
 		return fmt.Errorf("error reading config file: %w", err)
 	}
-	if err := v.Unmarshal(cfg); err != nil {
+	if err := v.Unmarshal(cfgPtr); err != nil {
 		return fmt.Errorf("error unmarshalling config: %w", err)
 	}
 
