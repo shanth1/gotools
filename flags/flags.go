@@ -15,11 +15,11 @@ import (
 // - usage (optional) - the help text that will be shown when called with -h or -help
 //
 // Example: `flag:"level" default:"info" usage:"Logging level (debug, info, error)"`
-func RegisterFromStruct(configStructPtr interface{}) error {
-	val := reflect.ValueOf(configStructPtr)
+func RegisterFromStruct(cfgPtr interface{}) error {
+	val := reflect.ValueOf(cfgPtr)
 
 	if val.Kind() != reflect.Ptr || val.Elem().Kind() != reflect.Struct {
-		return fmt.Errorf("expected a pointer to a struct, but got %T", configStructPtr)
+		return fmt.Errorf("expected a pointer to a struct, but got %T", cfgPtr)
 	}
 
 	elem := val.Elem()
