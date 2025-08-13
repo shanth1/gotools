@@ -8,6 +8,9 @@ import (
 )
 
 // RegisterFromStruct registers flags for the passed pointer to the structure with tags
+// registration sets default values in the structure
+// after registration (calling the function) it is necessary to parse the flags (flag.Parse())
+// after parsing, the value from the flags will be written to the structure
 //
 // Tag description:
 // - flag - flag name on command line
@@ -45,17 +48,18 @@ func RegisterFromStruct(cfgPtr interface{}) error {
 		case reflect.String:
 			ptr := fieldVal.Addr().Interface().(*string)
 			flag.StringVar(ptr, flagName, defaultValue, usage)
-
+		case reflect.Int64:
+			defaultValInt, _ := strconv.ParseInt(defaultValue, 10, 64)
+			ptr := fieldVal.Addr().Interface().(*int64)
+			flag.Int64Var(ptr, flagName, defaultValInt, usage)
 		case reflect.Int:
 			defaultValInt, _ := strconv.Atoi(defaultValue)
 			ptr := fieldVal.Addr().Interface().(*int)
 			flag.IntVar(ptr, flagName, defaultValInt, usage)
-
 		case reflect.Bool:
 			defaultValBool, _ := strconv.ParseBool(defaultValue)
 			ptr := fieldVal.Addr().Interface().(*bool)
 			flag.BoolVar(ptr, flagName, defaultValBool, usage)
-
 		default:
 			return fmt.Errorf("unsupported type for flag registration: %s", field.Type.Kind())
 		}
