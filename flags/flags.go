@@ -45,17 +45,18 @@ func RegisterFromStruct(cfgPtr interface{}) error {
 		case reflect.String:
 			ptr := fieldVal.Addr().Interface().(*string)
 			flag.StringVar(ptr, flagName, defaultValue, usage)
-
+		case reflect.Int64:
+			defaultValInt, _ := strconv.ParseInt(defaultValue, 10, 64)
+			ptr := fieldVal.Addr().Interface().(*int64)
+			flag.Int64Var(ptr, flagName, defaultValInt, usage)
 		case reflect.Int:
 			defaultValInt, _ := strconv.Atoi(defaultValue)
 			ptr := fieldVal.Addr().Interface().(*int)
 			flag.IntVar(ptr, flagName, defaultValInt, usage)
-
 		case reflect.Bool:
 			defaultValBool, _ := strconv.ParseBool(defaultValue)
 			ptr := fieldVal.Addr().Interface().(*bool)
 			flag.BoolVar(ptr, flagName, defaultValBool, usage)
-
 		default:
 			return fmt.Errorf("unsupported type for flag registration: %s", field.Type.Kind())
 		}
