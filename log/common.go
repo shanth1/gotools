@@ -39,7 +39,7 @@ func stringToLevel(level string) level {
 	case "fatal":
 		return LevelFatal
 	case "panic":
-		return LevelFatal
+		return LevelPanic
 	default:
 		return LevelInfo
 	}
