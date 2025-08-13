@@ -8,6 +8,9 @@ import (
 )
 
 // RegisterFromStruct registers flags for the passed pointer to the structure with tags
+// registration sets default values in the structure
+// after registration (calling the function) it is necessary to parse the flags (flag.Parse())
+// after parsing, the value from the flags will be written to the structure
 //
 // Tag description:
 // - flag - flag name on command line
