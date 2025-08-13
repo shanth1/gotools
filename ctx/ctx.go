@@ -20,14 +20,17 @@ func GetAppCtx(sigs ...os.Signal) (context.Context, context.CancelFunc) {
 // accepts a timeout for shutdown and a set of os signals for cancel (if not passed syscall.SIGINT and syscall.SIGTERM will be used)
 func WithGracefulShutdown(shutdownTimeout time.Duration, sigs ...os.Signal) (ctx, shutdownCtx context.Context, shutdownCancel context.CancelFunc) {
 	ctx, cancel := withSignals(context.Background(), sigs...)
-	shutdownCtx, shutdownCancel = context.WithTimeout(ctx, shutdownTimeout)
+	shutdownCtx, shutdownCancel = context.WithTimeout(context.Background(), shutdownTimeout)
 
 	go func() {
-		<-shutdownCtx.Done()
-		cancel()
+		select {
+		case <-ctx.Done():
+		case <-shutdownCtx.Done():
+			cancel()
+		}
 	}()
 
-	return
+	return ctx, shutdownCtx, shutdownCancel
 }
 
 // withSignals creates a new context with the given signals
