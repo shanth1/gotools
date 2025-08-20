@@ -17,7 +17,6 @@ stop:
 restart:
 	systemctl restart $(SERVICE)
 
-
 enable:
 	systemctl enable $(SERVICE)
 
