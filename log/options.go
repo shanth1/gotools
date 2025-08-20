@@ -1,7 +1,9 @@
 package log
 
 import (
+	"fmt"
 	"io"
+	"net"
 	"os"
 	"time"
 
@@ -53,5 +55,24 @@ func WithService(service string) option {
 func WithCaller() option {
 	return func(c *config) {
 		c.enableCaller = true
+	}
+}
+
+// WithUDPWriter adds a writer that sends JSON logs over UDP to the specified address.
+func WithUDPWriter(addr string) option {
+	return func(c *config) {
+		udpAddr, err := net.ResolveUDPAddr("udp", addr)
+		if err != nil {
+			_, _ = fmt.Fprintf(os.Stderr, "Failed to resolve UDP address %s: %v\n", addr, err)
+			return
+		}
+
+		conn, err := net.DialUDP("udp", nil, udpAddr)
+		if err != nil {
+			_, _ = fmt.Fprintf(os.Stderr, "Failed to connect to UDP address %s: %v\n", addr, err)
+			return
+		}
+
+		c.writers = append(c.writers, conn)
 	}
 }
