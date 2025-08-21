@@ -5,6 +5,9 @@ const (
 	EnvDev   = "development"
 	EnvProd  = "production"
 
+	StatusSuccess = "success"
+	StatusError   = "error"
+
 	ContentTypeJSON = "application/json"
 	ContentTypeText = "text/plain"
 )
