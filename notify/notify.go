@@ -2,8 +2,8 @@ package notify
 
 import (
 	"context"
+	"errors"
 	"fmt"
-	"strings"
 
 	"github.com/shanth1/gotools/log"
 )
@@ -41,13 +41,8 @@ func (s *service) Send(ctx context.Context, message string) error {
 		}
 	}
 
-	// TODO: refactor
 	if len(errs) > 0 {
-		var strErrs []string
-		for _, err := range errs {
-			strErrs = append(strErrs, err.Error())
-		}
-		return fmt.Errorf("send notification(s): %s", strings.Join(strErrs, ", "))
+		return fmt.Errorf("send notification(s): %w", errors.Join(errs...))
 	}
 
 	return nil

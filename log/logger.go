@@ -36,6 +36,30 @@ func New(opts ...option) Logger {
 	return newZerologLogger(opts...)
 }
 
+func NewFromConfig(cfg Config) Logger {
+	opts := []option{
+		WithService(cfg.Service),
+	}
+
+	if cfg.Level != "" {
+		opts = append(opts, WithLevel(stringToLevel(cfg.Level)))
+	}
+
+	if cfg.EnableCaller {
+		opts = append(opts, WithCaller())
+	}
+
+	if cfg.UDPAddress != "" {
+		opts = append(opts, WithUDPWriter(cfg.UDPAddress))
+	}
+
+	if cfg.UDPAddress == "" || cfg.Console {
+		opts = append(opts, WithConsoleWriter())
+	}
+
+	return newZerologLogger(opts...)
+}
+
 type Event interface {
 	Str(key, val string) Event
 	Strs(key string, vals []string) Event
