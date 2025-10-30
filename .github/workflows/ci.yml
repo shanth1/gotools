@@ -1,0 +1,63 @@
+name: Go CI
+
+on:
+  push:
+    branches: ['main']
+  pull_request:
+    branches: ['main']
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        go-version: ['1.22.x', '1.23.x']
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ matrix.go-version }}
+
+      - name: Cache Go modules
+        uses: actions/cache@v4
+        with:
+          path: ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
+
+      - name: Install dependencies
+        run: go mod download
+
+      - name: Run linter
+        uses: golangci/golangci-lint-action@v6
+        with:
+          version: v1.59
+          args: --timeout=5m
+
+      - name: Check formatting
+        run: |
+          if [ -n "$(gofmt -l .)" ]; then
+            echo "Go код не отформатирован. Пожалуйста, запустите 'make fmt' или 'gofmt -w .'"
+            gofmt -d .
+            exit 1
+          fi
+
+      - name: Verify module tidiness
+        run: |
+          go mod tidy
+          if ! git diff --exit-code go.mod go.sum; then
+            echo "go.mod или go.sum не актуальны. Пожалуйста, запустите 'go mod tidy' и закоммитьте изменения."
+            exit 1
+          fi
+
+      - name: Run vet
+        run: make vet
+
+      - name: Run tests
+        run: make test

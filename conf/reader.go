@@ -7,7 +7,8 @@ import (
 	"github.com/spf13/viper"
 )
 
-// Load loads the yaml config by accepting a path and a pointer to the structure
+// Load reads a YAML configuration file from the given path into a struct.
+// The cfgPtr argument must be a pointer to the struct that will hold the configuration.
 func Load(path string, cfgPtr interface{}) error {
 	val := reflect.ValueOf(cfgPtr)
 

@@ -17,7 +17,8 @@ var (
 	ErrNotAvailable   = errors.New("service not available")
 )
 
-// Wrap adds context to an existing error
+// Wrap adds a contextual message to an existing error.
+// If err is nil, it returns nil.
 func Wrap(err error, message string) error {
 	if err == nil {
 		return nil
