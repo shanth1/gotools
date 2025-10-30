@@ -27,7 +27,7 @@ func WithGracefulShutdown(shutdownTimeout time.Duration, sigs ...os.Signal) (ctx
 		shutdownTimer := time.AfterFunc(shutdownTimeout, func() {
 			shutdownCancel()
 		})
-		defer shutdownTimer.Stop()
+		_ = shutdownTimer
 	}()
 
 	return ctx, shutdownCtx, cancel, shutdownCancel

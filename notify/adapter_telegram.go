@@ -12,7 +12,7 @@ import (
 	"time"
 )
 
-const telegramAPIURLTemplate = "https://api.telegram.org/bot%s/sendMessage"
+var telegramAPIURLTemplate = "https://api.telegram.org/bot%s/sendMessage"
 
 // ErrMarkdownFallback is returned when a message is sent successfully, but Telegram
 // could not parse the MarkdownV2 formatting, so it was sent as plain text.
