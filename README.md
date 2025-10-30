@@ -2,24 +2,6 @@
 
 A collection of common, reusable Go packages for building applications. It includes utilities for configuration, logging, context management, command-line flags, and more.
 
-Of course. I will update all documentation and comments to English, restructure the documentation into separate `README.md` files for each package, and ensure the formatting is correct.
-
-Here is the complete set of updated files for your project.
-
----
-
-### **Root Project Files**
-
-This is the main `README.md` with an overview and links to each package's documentation.
-
-================================================
-FILE: README.md
-================================================
-
-# Go Common
-
-A collection of common, reusable Go packages for building applications. It includes utilities for configuration, logging, context management, command-line flags, and more.
-
 ## Installation
 
 ```sh
