@@ -7,15 +7,16 @@ import (
 	"strconv"
 )
 
-// RegisterFromStruct registers flags for the passed pointer to the structure with tags
-// registration sets default values in the structure
-// after registration (calling the function) it is necessary to parse the flags (flag.Parse())
-// after parsing, the value from the flags will be written to the structure
+// RegisterFromStruct registers command-line flags based on a struct's fields and tags.
+//
+// It takes a pointer to a struct (cfgPtr) and sets default values on its fields.
+// After calling this function, flag.Parse() must be called to populate the struct
+// with values from the command line.
 //
 // Tag description:
-// - flag - flag name on command line
-// - default (optional) - the default value for this flag
-// - usage (optional) - the help text that will be shown when called with -h or -help
+// - `flag`: The name of the flag on the command line.
+// - `default`: (optional) The default value for this flag.
+// - `usage`: (optional) The help text that will be shown when called with -h or -help.
 //
 // Example: `flag:"level" default:"info" usage:"Logging level (debug, info, error)"`
 func RegisterFromStruct(cfgPtr interface{}) error {

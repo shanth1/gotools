@@ -2,311 +2,98 @@
 
 A collection of common, reusable Go packages for building applications. It includes utilities for configuration, logging, context management, command-line flags, and more.
 
+Of course. I will update all documentation and comments to English, restructure the documentation into separate `README.md` files for each package, and ensure the formatting is correct.
+
+Here is the complete set of updated files for your project.
+
+---
+
+### **Root Project Files**
+
+This is the main `README.md` with an overview and links to each package's documentation.
+
+================================================
+FILE: README.md
+================================================
+
+# Go Common
+
+A collection of common, reusable Go packages for building applications. It includes utilities for configuration, logging, context management, command-line flags, and more.
+
 ## Installation
 
 ```sh
 go get github.com/shanth1/gotools
 ```
 
----
-
 ## Packages
 
-- [**`conf`**](#conf---configuration-loader): Load YAML configuration files into Go structs.
-- [**`flags`**](#flags---cli-flag-parsing): Register command-line flags from struct tags.
-- [**`log`**](#log---structured-logging): A structured, leveled logging wrapper around `zerolog`.
-- [**`ctx`**](#ctx---context-management): Helpers for graceful shutdown and request-scoped context values.
-- [**`notify`**](#notify---notifications): Notification service with support for Telegram and Email.
-- [**`errs`**](#errs---standard-errors): A set of pre-defined, common application errors.
-- [**`consts`**](#consts---common-constants): Pre-defined constants for environments, statuses, etc.
+- [**`conf`**](./conf/.md): Load configuration from YAML files into Go structs.
+- [**`flags`**](./flags/.md): Register command-line flags from struct tags.
+- [**`log`**](./log/.md): A structured, leveled logging wrapper around `zerolog`.
+- [**`ctx`**](./ctx/.md): Helpers for graceful shutdown and request-scoped context values.
+- [**`env`**](./env/.md): Load environment variables from the system and `.env` files.
+- [**`notify`**](./notify/.md): Notification services with support for Telegram and Email.
+- [**`errs`**](./errs/.md): A set of pre-defined, common application errors.
+- [**`consts`**](./consts/.md): Pre-defined constants for environments, statuses, etc.
+
+You are absolutely right, my apologies for missing that package. I will create the documentation and add comments for the `env` package now.
+
+I will also update the main `README.md` file to include a link to this new package's documentation.
 
 ---
 
-### `conf` - Configuration Loader
+### **Package `env`**
 
-The `conf` package provides a simple function to load a YAML configuration file into a struct.
+Here are the new documentation file and the updated source file for the `env` package.
 
-**Usage**
+================================================
+FILE: env/README.md
+================================================
 
-Given a `config.yaml` file:
-
-```yaml
-# ./config.yaml
-port: 8080
-log_level: 'debug'
-```
-
-You can load it like this:
-
-```go
-package main
+================================================
+FILE: env/env.go
+================================================
+// Package env provides a utility for loading environment variables
+// from the system and .env files into a Go struct.
+package env
 
 import (
-	"fmt"
-	"log"
+"fmt"
+"reflect"
 
-	"github.com/shanth1/gotools/conf"
+    "github.com/ilyakaznacheev/cleanenv"
+    "github.com/joho/godotenv"
+
 )
 
-type Config struct {
-	Port     int    `yaml:"port"`
-	LogLevel string `yaml:"log_level"`
+// LoadIntoStruct loads configuration from system environment variables and,
+// optionally, from a .env file into a target struct.
+//
+// The cfgPtr argument must be a pointer to the struct. The envPath is the
+// path to the .env file; if it's an empty string, the file is skipped.
+//
+// Loading Priority: System Environment Variables > .env file.
+// This means existing environment variables will not be overwritten by the .env file.
+//
+// Fields in the struct must be tagged with `env`, e.g., `env:"DB_HOST"`.
+func LoadIntoStruct(envPath string, cfgPtr interface{}) error {
+val := reflect.ValueOf(cfgPtr)
+if val.Kind() != reflect.Ptr || val.Elem().Kind() != reflect.Struct {
+return fmt.Errorf("expected a pointer to a struct, but got %T", cfgPtr)
 }
 
-func main() {
-	var cfg Config
-	if err := conf.Load("config.yaml", &cfg); err != nil {
-		log.Fatalf("failed to load config: %v", err)
-	}
+    if envPath != "" {
+    	// godotenv.Load does not override existing environment variables.
+    	if err := godotenv.Load(envPath); err != nil {
+    		return fmt.Errorf("read env file: %w", err)
+    	}
+    }
 
-	fmt.Printf("Port: %d, Log Level: %s\n", cfg.Port, cfg.LogLevel)
-	// Output: Port: 8080, Log Level: debug
+    if err := cleanenv.ReadEnv(cfgPtr); err != nil {
+    	return fmt.Errorf("read environment variables: %w", err)
+    }
+
+    return nil
+
 }
-```
-
-### `flags` - CLI Flag Parsing
-
-This package allows you to define command-line flags using struct tags. It automatically registers flags and populates the struct instance after parsing.
-
-**Supported tags:**
-
-- `flag:"<name>"`: The name of the flag (e.g., `--port`).
-- `default:"<value>"`: The default value for the flag.
-- `usage:"<description>"`: The help text for the flag.
-
-**Usage**
-
-```go
-package main
-
-import (
-	"flag"
-	"fmt"
-	"log"
-
-	"github.com/shanth1/gotools/flags"
-)
-
-type AppConfig struct {
-	Port    int    `flag:"port" default:"8080" usage:"TCP port to listen on"`
-	LogLevel string `flag:"log-level" default:"info" usage:"Logging level (debug, info)"`
-	DevMode  bool   `flag:"dev" default:"false" usage:"Enable development mode"`
-}
-
-func main() {
-	var cfg AppConfig
-	if err := flags.RegisterFromStruct(&cfg); err != nil {
-		log.Fatalf("failed to register flags: %v", err)
-	}
-	flag.Parse()
-
-	fmt.Printf("Starting with config: %+v\n", cfg)
-}
-```
-
-**Example execution:**
-
-```sh
-# Run with custom flags
-go run main.go --port=3000 --dev
-
-# Output:
-# Starting with config: {Port:3000 LogLevel:info DevMode:true}
-```
-
-### `log` - Structured Logging
-
-A flexible logging library built on `zerolog`. It supports configuration via options or a struct, multiple writers (console, UDP), and context integration.
-
-**Usage**
-
-```go
-package main
-
-import (
-	"errors"
-
-	"github.com/shanth1/gotools/log"
-)
-
-func main() {
-	// Simple initialization with options
-	logger := log.New(
-		log.WithService("my-app"),
-		log.WithLevel(log.LevelDebug),
-		log.WithCaller(),
-	)
-
-	logger.Info().Msg("Service starting...")
-	logger.Debug().Str("user_id", "123").Msg("User logged in")
-	logger.Error().Err(errors.New("database connection failed")).Msg("A critical error occurred")
-}
-```
-
-You can also initialize the logger from a configuration struct, which is useful when combined with the `conf` package.
-
-### `ctx` - Context Management
-
-Provides helpers for handling application lifecycle signals (graceful shutdown) and managing request-scoped values in `context.Context`.
-
-**Usage: Graceful Shutdown**
-
-```go
-package main
-
-import (
-	"fmt"
-	"net/http"
-	"time"
-
-	"github.com/shanth1/gotools/ctx"
-)
-
-func main() {
-	// Create contexts for the app and its shutdown period.
-	appCtx, shutdownCtx, cancel, shutdownCancel := ctx.WithGracefulShutdown(10 * time.Second)
-	defer cancel()
-	defer shutdownCancel()
-
-	server := &http.Server{Addr: ":8080"}
-
-	// Run the server in a goroutine
-	go func() {
-		fmt.Println("Server starting on :8080")
-		if err := server.ListenAndServe(); err != http.ErrServerClosed {
-			fmt.Printf("Server error: %v\n", err)
-		}
-	}()
-
-	// Wait for an OS signal (e.g., Ctrl+C)
-	<-appCtx.Done()
-	fmt.Println("Shutdown signal received. Shutting down gracefully...")
-
-	// Attempt to shut down the server within the timeout
-	if err := server.Shutdown(shutdownCtx); err != nil {
-		fmt.Printf("Server shutdown failed: %v\n", err)
-	} else {
-		fmt.Println("Server stopped successfully.")
-	}
-}
-```
-
-**Usage: Context Values**
-
-```go
-package main
-
-import (
-	"context"
-	"fmt"
-
-	"github.com/shanth1/gotools/ctx"
-)
-
-func processRequest(c context.Context) {
-	if reqID, ok := ctx.RequestIDFrom(c); ok {
-		fmt.Printf("Processing request with ID: %s\n", reqID)
-	} else {
-		fmt.Println("No request ID found in context.")
-	}
-}
-
-func main() {
-	// Create a context with a request ID
-	c := ctx.WithRequestID(context.Background(), "req-abc-123")
-	processRequest(c) // Output: Processing request with ID: req-abc-123
-}
-```
-
-### `notify` - Notifications
-
-A service for sending notifications through different channels like Telegram or email.
-
-**Usage**
-
-```go
-package main
-
-import (
-	"context"
-	"log"
-	"os"
-
-	"github.com/shanth1/gotools/notify"
-)
-
-func main() {
-	telegramToken := os.Getenv("TELEGRAM_TOKEN")
-	chatID := os.Getenv("TELEGRAM_CHAT_ID")
-
-	notifier, err := notify.New(
-		notify.WithTelegram(telegramToken, chatID),
-	)
-	if err != nil {
-		log.Fatalf("Failed to create notifier: %v", err)
-	}
-
-	err = notifier.Send(context.Background(), "Hello from the *go-common* library!")
-	if err != nil {
-		log.Printf("Failed to send notification: %v", err)
-	}
-}
-```
-
-### `errs` - Standard Errors
-
-Defines a set of standard, exported errors for common use cases in applications. It also includes a `Wrap` function to add context to errors.
-
-**Usage**
-
-```go
-package main
-
-import (
-	"database/sql"
-	"fmt"
-
-	"github.com/shanth1/gotools/errs"
-)
-
-func findUserByID(id int) error {
-	// Simulate a database call
-	err := sql.ErrNoRows
-	if err == sql.ErrNoRows {
-		return errs.Wrap(errs.ErrNotFound, fmt.Sprintf("user with id %d", id))
-	}
-	return nil
-}
-
-func main() {
-	err := findUserByID(42)
-	fmt.Println(err) // Output: user with id 42: resource not found
-}
-```
-
-### `consts` - Common Constants
-
-This package provides sets of string constants to ensure consistency across your application.
-
-**Available Constants**
-
-```go
-// Environments
-const (
-	EnvLocal = "local"
-	EnvDev   = "development"
-	EnvProd  = "production"
-)
-
-// Statuses
-const (
-	StatusSuccess = "success"
-	StatusError   = "error"
-)
-
-// Content Types
-const (
-	ContentTypeJSON = "application/json"
-	ContentTypeText = "text/plain"
-)
-```

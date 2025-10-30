@@ -27,15 +27,17 @@ type Logger interface {
 	With(fields ...Field) Logger
 }
 
-// New creates the logger
+// New creates a logger with the given options.
 //
-// use With* funcs from package to add custom options
-// - default log level: info
-// - default writer: formatted console writer
+// Use With\* functions from this package for configuration.
+// - Default log level: info
+// - Default writer: formatted console writer
 func New(opts ...option) Logger {
 	return newZerologLogger(opts...)
 }
 
+// NewFromConfig creates a logger from a configuration struct.
+// This is convenient for initializing the logger from a YAML file.
 func NewFromConfig(cfg Config) Logger {
 	opts := []option{
 		WithService(cfg.Service),

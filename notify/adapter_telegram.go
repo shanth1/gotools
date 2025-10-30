@@ -14,13 +14,18 @@ import (
 
 const telegramAPIURLTemplate = "https://api.telegram.org/bot%s/sendMessage"
 
+// ErrMarkdownFallback is returned when a message is sent successfully, but Telegram
+// could not parse the MarkdownV2 formatting, so it was sent as plain text.
 var ErrMarkdownFallback = errors.New("message sent successfully, but markdown formatting was stripped")
 
+// TelegramNotifier implements a notifier for sending messages to Telegram.
 type TelegramNotifier struct {
 	client *http.Client
 	token  string
 }
 
+// NewTelegramNotifier creates a new Telegram notifier.
+// A Telegram bot token is required.
 func NewTelegramNotifier(token string) (*TelegramNotifier, error) {
 	if token == "" {
 		return nil, fmt.Errorf("telegram token cannot be empty")
@@ -31,6 +36,9 @@ func NewTelegramNotifier(token string) (*TelegramNotifier, error) {
 	}, nil
 }
 
+// Send dispatches a message to the specified Telegram chat.
+// It first attempts to send with MarkdownV2 formatting. If the Telegram API
+// returns a parsing error, it retries sending as plain text and returns ErrMarkdownFallback.
 func (n *TelegramNotifier) Send(ctx context.Context, chatID string, msg Message) error {
 	err := n.trySend(ctx, chatID, msg.Text, "MarkdownV2")
 	if err == nil {

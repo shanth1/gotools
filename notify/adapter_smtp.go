@@ -6,6 +6,7 @@ import (
 	"net/smtp"
 )
 
+// EmailConfig holds the connection parameters for an SMTP server.
 type EmailConfig struct {
 	Host     string
 	Port     int
@@ -14,12 +15,14 @@ type EmailConfig struct {
 	From     string
 }
 
+// EmailNotifier implements a notifier for sending emails.
 type EmailNotifier struct {
 	cfg  EmailConfig
 	auth smtp.Auth
 	addr string
 }
 
+// NewEmailNotifier creates and configures a new notifier for sending emails via SMTP.
 func NewEmailNotifier(cfg EmailConfig) (*EmailNotifier, error) {
 	if cfg.Host == "" || cfg.Port == 0 || cfg.Username == "" || cfg.Password == "" {
 		return nil, fmt.Errorf("email config is incomplete (host, port, username, password are required)")
@@ -36,6 +39,7 @@ func NewEmailNotifier(cfg EmailConfig) (*EmailNotifier, error) {
 	}, nil
 }
 
+// Send sends an email to the specified recipient.
 func (n *EmailNotifier) Send(ctx context.Context, recipientEmail string, msg Message) error {
 	subject := msg.Subject
 	if subject == "" {
