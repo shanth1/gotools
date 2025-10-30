@@ -10,7 +10,7 @@ jobs:
   build:
     strategy:
       matrix:
-        go-version: ['1.22.x', '1.23.x']
+        go-version: ['1.23.x']
 
     runs-on: ubuntu-latest
 
@@ -38,12 +38,13 @@ jobs:
         uses: golangci/golangci-lint-action@v6
         with:
           version: v1.59
+          go-version: ${{ matrix.go-version }}
           args: --timeout=5m
 
       - name: Check formatting
         run: |
           if [ -n "$(gofmt -l .)" ]; then
-            echo "Go код не отформатирован. Пожалуйста, запустите 'make fmt' или 'gofmt -w .'"
+            echo "Go code is not formatted. Please run 'make fmt' or 'gofmt -w .'"
             gofmt -d .
             exit 1
           fi
@@ -52,7 +53,7 @@ jobs:
         run: |
           go mod tidy
           if ! git diff --exit-code go.mod go.sum; then
-            echo "go.mod или go.sum не актуальны. Пожалуйста, запустите 'go mod tidy' и закоммитьте изменения."
+            echo "go.mod or go.sum are not up-to-date. Please run 'go mod tidy' and commit the changes."
             exit 1
           fi
 
