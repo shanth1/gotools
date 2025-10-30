@@ -1,3 +1,5 @@
+# .github/workflows/ci.yml
+
 name: Go CI
 
 on:
@@ -38,6 +40,7 @@ jobs:
         uses: golangci/golangci-lint-action@v6
         with:
           version: v1.59
+          go-version: ${{ matrix.go-version }}
           args: --timeout=5m
 
       - name: Check formatting
