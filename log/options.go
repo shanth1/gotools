@@ -66,6 +66,34 @@ func WithCaller() option {
 	}
 }
 
+// WithConfig applies all settings from the Config structure.
+func WithConfig(cfg Config) option {
+	return func(c *config) {
+		if cfg.App != "" {
+			c.app = cfg.App
+		}
+		if cfg.Service != "" {
+			c.service = cfg.Service
+		}
+		if cfg.Level != "" {
+			c.level = stringToLevel(cfg.Level)
+		}
+		if cfg.EnableCaller {
+			c.enableCaller = true
+		}
+
+		c.writers = []io.Writer{}
+
+		if cfg.UDPAddress != "" {
+			WithUDPWriter(cfg.UDPAddress)(c)
+		}
+
+		if cfg.UDPAddress == "" || cfg.Console {
+			WithConsoleWriter()(c)
+		}
+	}
+}
+
 // WithUDPWriter adds a writer that sends JSON logs over UDP to the specified address.
 func WithUDPWriter(addr string) option {
 	return func(c *config) {
