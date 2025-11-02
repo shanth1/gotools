@@ -13,6 +13,7 @@ import (
 type config struct {
 	level        level
 	writers      []io.Writer
+	app          string
 	service      string
 	enableCaller bool
 }
@@ -41,6 +42,13 @@ func WithConsoleWriter() option {
 			Out:        os.Stdout,
 			TimeFormat: time.RFC3339,
 		})
+	}
+}
+
+// WithApp adds the app name to all log entries
+func WithApp(app string) option {
+	return func(c *config) {
+		c.app = app
 	}
 }
 
