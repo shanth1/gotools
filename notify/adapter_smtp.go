@@ -8,11 +8,11 @@ import (
 
 // EmailConfig holds the connection parameters for an SMTP server.
 type EmailConfig struct {
-	Host     string
-	Port     int
-	Username string
-	Password string
-	From     string
+	Host     string `mapstructure:"host" yaml:"host" json:"host" toml:"host" env:"EMAIL_HOST"`
+	Port     int    `mapstructure:"port" yaml:"port" json:"port" toml:"port" env:"EMAIL_PORT"`
+	Username string `mapstructure:"username" yaml:"username" json:"username" toml:"username" env:"EMAIL_USERNAME"`
+	Password string `mapstructure:"password" yaml:"password" json:"password" toml:"password" env:"EMAIL_PASSWORD"`
+	From     string `mapstructure:"from" yaml:"from" json:"from" toml:"from" env:"EMAIL_FROM"`
 }
 
 // EmailNotifier implements a notifier for sending emails.
