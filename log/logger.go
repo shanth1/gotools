@@ -39,8 +39,14 @@ func New(opts ...option) Logger {
 // NewFromConfig creates a logger from a configuration struct.
 // This is convenient for initializing the logger from a YAML file.
 func NewFromConfig(cfg Config) Logger {
-	opts := []option{
-		WithService(cfg.Service),
+	opts := []option{}
+
+	if cfg.App != "" {
+		opts = append(opts, WithApp(cfg.App))
+	}
+
+	if cfg.Service != "" {
+		opts = append(opts, WithService(cfg.Service))
 	}
 
 	if cfg.Level != "" {
