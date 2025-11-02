@@ -25,6 +25,7 @@ type Logger interface {
 	Error() Event
 	Fatal() Event
 	With(fields ...Field) Logger
+	WithOptions(opts ...option) Logger
 }
 
 // New creates a logger with the given options.

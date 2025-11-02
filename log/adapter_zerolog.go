@@ -2,6 +2,8 @@ package log
 
 import (
 	"io"
+	"os"
+	"time"
 
 	"github.com/rs/zerolog"
 )
@@ -9,6 +11,7 @@ import (
 // zerologAdapter implements the Logger interface
 type zerologAdapter struct {
 	logger zerolog.Logger
+	cfg    *config
 }
 
 // zerologEvent implements the Event interface
@@ -30,25 +33,7 @@ func newZerologLogger(opts ...option) Logger {
 		WithConsoleWriter()(cfg)
 	}
 
-	zlevel, err := zerolog.ParseLevel(levelToString(cfg.level))
-	if err != nil {
-		zlevel = zerolog.InfoLevel
-	}
-
-	multi := zerolog.MultiLevelWriter(cfg.writers...)
-
-	context := zerolog.New(multi).With().Timestamp()
-
-	if cfg.service != "" {
-		context = context.Str("service", cfg.service)
-	}
-	if cfg.enableCaller {
-		context = context.Caller()
-	}
-
-	logger := context.Logger().Level(zlevel)
-
-	return &zerologAdapter{logger: logger}
+	return newLoggerWithConfig(cfg)
 }
 
 func (l *zerologAdapter) With(fields ...Field) Logger {
@@ -56,7 +41,20 @@ func (l *zerologAdapter) With(fields ...Field) Logger {
 	for _, f := range fields {
 		context = context.Interface(f.Key, f.Value)
 	}
-	return &zerologAdapter{logger: context.Logger()}
+	return &zerologAdapter{
+		logger: context.Logger(),
+		cfg:    l.cfg,
+	}
+}
+
+func (l *zerologAdapter) WithOptions(opts ...option) Logger {
+	newCfg := *l.cfg
+
+	for _, opt := range opts {
+		opt(&newCfg)
+	}
+
+	return newLoggerWithConfig(&newCfg)
 }
 
 // --- Logger ---
@@ -90,4 +88,39 @@ func (e *zerologEvent) Msg(msg string) {
 
 func (e *zerologEvent) Msgf(format string, v ...interface{}) {
 	e.event.Msgf(format, v...)
+}
+
+// --- Constructor ---
+func newLoggerWithConfig(cfg *config) Logger {
+	if len(cfg.writers) == 0 {
+		cfg.writers = append(cfg.writers, zerolog.ConsoleWriter{
+			Out:        os.Stdout,
+			TimeFormat: time.RFC3339,
+		})
+	}
+
+	zlevel, err := zerolog.ParseLevel(levelToString(cfg.level))
+	if err != nil {
+		zlevel = zerolog.InfoLevel
+	}
+
+	multi := zerolog.MultiLevelWriter(cfg.writers...)
+	context := zerolog.New(multi).With().Timestamp()
+
+	if cfg.app != "" {
+		context = context.Str("app", cfg.app)
+	}
+	if cfg.service != "" {
+		context = context.Str("service", cfg.service)
+	}
+	if cfg.enableCaller {
+		context = context.Caller()
+	}
+
+	logger := context.Logger().Level(zlevel)
+
+	return &zerologAdapter{
+		logger: logger,
+		cfg:    cfg,
+	}
 }
