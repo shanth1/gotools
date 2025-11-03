@@ -7,4 +7,5 @@ type Config struct {
 	EnableCaller bool   `mapstructure:"enable_caller" yaml:"enable_caller" json:"enable_caller" toml:"enable_caller"`
 	UDPAddress   string `mapstructure:"udp_address" yaml:"udp_address" json:"udp_address" toml:"udp_address"`
 	Console      bool   `mapstructure:"console" yaml:"console" json:"console" toml:"console"`
+	JSONOutput   bool   `mapstructure:"json_output" yaml:"json_output" json:"json_output" toml:"json_output"`
 }

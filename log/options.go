@@ -111,6 +111,14 @@ func WithConfig(cfg Config) option {
 		if cfg.Console {
 			WithConsoleWriter()(c)
 		}
+
+		if cfg.JSONOutput {
+			WithStdoutWriter()(c)
+		}
+
+		if len(c.writers) == 0 {
+			c.writers = append(c.writers, io.Discard)
+		}
 	}
 }
 
