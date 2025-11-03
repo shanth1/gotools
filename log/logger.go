@@ -1,5 +1,7 @@
 package log
 
+import "io"
+
 type level int8
 
 const (
@@ -35,6 +37,19 @@ type Logger interface {
 // - Default writer: formatted console writer
 func New(opts ...option) Logger {
 	return newZerologLogger(opts...)
+}
+
+func NewExplicit(opts ...option) Logger {
+	cfg := &config{
+		level:   LevelInfo,
+		writers: []io.Writer{},
+	}
+
+	for _, opt := range opts {
+		opt(cfg)
+	}
+
+	return newLoggerWithConfig(cfg)
 }
 
 // NewFromConfig creates a logger from a configuration struct.

@@ -50,6 +50,9 @@ func (l *zerologAdapter) With(fields ...Field) Logger {
 func (l *zerologAdapter) WithOptions(opts ...option) Logger {
 	newCfg := *l.cfg
 
+	newCfg.writers = make([]io.Writer, len(l.cfg.writers))
+	copy(newCfg.writers, l.cfg.writers)
+
 	for _, opt := range opts {
 		opt(&newCfg)
 	}
