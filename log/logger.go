@@ -1,7 +1,5 @@
 package log
 
-import "io"
-
 type level int8
 
 const (
@@ -26,6 +24,7 @@ type Logger interface {
 	Warn() Event
 	Error() Event
 	Fatal() Event
+	Panic() Event
 	With(fields ...Field) Logger
 	WithOptions(opts ...option) Logger
 }
@@ -37,19 +36,6 @@ type Logger interface {
 // - Default writer: formatted console writer
 func New(opts ...option) Logger {
 	return newZerologLogger(opts...)
-}
-
-func NewExplicit(opts ...option) Logger {
-	cfg := &config{
-		level:   LevelInfo,
-		writers: []io.Writer{},
-	}
-
-	for _, opt := range opts {
-		opt(cfg)
-	}
-
-	return newLoggerWithConfig(cfg)
 }
 
 // NewFromConfig creates a logger from a configuration struct.
@@ -72,5 +58,6 @@ type Event interface {
 
 func Str(key, value string) Field             { return Field{key, value} }
 func Int(key string, value int) Field         { return Field{key, value} }
+func Bool(key string, value bool) Field       { return Field{key, value} }
 func Err(err error) Field                     { return Field{"error", err} }
 func Any(key string, value interface{}) Field { return Field{key, value} }

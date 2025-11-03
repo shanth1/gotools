@@ -2,45 +2,36 @@ package log
 
 import "strings"
 
+var levelToStringMap = map[level]string{
+	LevelTrace: "trace",
+	LevelDebug: "debug",
+	LevelInfo:  "info",
+	LevelWarn:  "warn",
+	LevelError: "error",
+	LevelFatal: "fatal",
+	LevelPanic: "panic",
+}
+
 func levelToString(level level) string {
-	switch level {
-	case LevelTrace:
-		return "trace"
-	case LevelDebug:
-		return "debug"
-	case LevelInfo:
-		return "info"
-	case LevelWarn:
-		return "warn"
-	case LevelError:
-		return "error"
-	case LevelFatal:
-		return "fatal"
-	case LevelPanic:
-		return "panic"
-	default:
-		return "info"
+	if s, ok := levelToStringMap[level]; ok {
+		return s
 	}
+	return "info"
+}
+
+var stringToLevelMap = map[string]level{
+	"trace": LevelTrace,
+	"debug": LevelDebug,
+	"info":  LevelInfo,
+	"warn":  LevelWarn,
+	"error": LevelError,
+	"fatal": LevelFatal,
+	"panic": LevelPanic,
 }
 
 func stringToLevel(level string) level {
-	level = strings.ToLower(level)
-	switch level {
-	case "trace":
-		return LevelTrace
-	case "debug":
-		return LevelDebug
-	case "info":
-		return LevelInfo
-	case "warn":
-		return LevelWarn
-	case "error":
-		return LevelError
-	case "fatal":
-		return LevelFatal
-	case "panic":
-		return LevelPanic
-	default:
-		return LevelInfo
+	if l, ok := stringToLevelMap[strings.ToLower(level)]; ok {
+		return l
 	}
+	return LevelInfo
 }

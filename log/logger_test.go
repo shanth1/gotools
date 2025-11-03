@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -30,6 +31,12 @@ func TestNew(t *testing.T) {
 		assert.Contains(t, output, `"key":"value"`)
 		assert.Contains(t, output, `"message":"hello"`)
 	})
+
+	t.Run("default writer", func(t *testing.T) {
+		t.Parallel()
+		logger := New()
+		assert.NotNil(t, logger)
+	})
 }
 
 func TestNewFromConfig(t *testing.T) {
@@ -42,8 +49,7 @@ func TestNewFromConfig(t *testing.T) {
 	}
 
 	logger := NewFromConfig(cfg)
-	// Replace default writers with our buffer for testing
-	logger = New(WithLevel(stringToLevel(cfg.Level)), WithService(cfg.Service), WithCaller(), WithWriter(&buf))
+	logger = logger.WithOptions(WithWriter(&buf))
 
 	logger.Info().Msg("should not appear")
 	logger.Warn().Msg("should appear")
@@ -61,9 +67,7 @@ func TestLogger_With(t *testing.T) {
 	var buf bytes.Buffer
 	logger := New(WithWriter(&buf))
 
-	// Create a logger with a pre-set field
 	subLogger := logger.With(Str("request_id", "abc-123"))
-
 	subLogger.Info().Msg("request processed")
 
 	var logEntry map[string]interface{}
@@ -81,10 +85,14 @@ func TestLogger_Levels(t *testing.T) {
 
 	logger.Debug().Msg("debug log")
 	logger.Info().Msg("info log")
+	logger.Warn().Msg("warn log")
 
 	output := buf.String()
+	lines := strings.Split(strings.TrimSpace(output), "\n")
+	require.Len(t, lines, 2)
 	assert.NotContains(t, output, "debug log")
-	assert.Contains(t, output, "info log")
+	assert.Contains(t, lines[0], "info log")
+	assert.Contains(t, lines[1], "warn log")
 }
 
 func TestContext(t *testing.T) {
@@ -95,10 +103,16 @@ func TestContext(t *testing.T) {
 	ctx := NewContext(context.Background(), logger)
 	ctxLogger := FromContext(ctx)
 
+	require.NotNil(t, ctxLogger)
 	ctxLogger.Info().Msg("from context")
 
-	assert.Contains(t, buf.String(), "ctx-logger")
-	assert.Contains(t, buf.String(), "from context")
+	output := buf.String()
+	assert.Contains(t, output, `"service":"ctx-logger"`)
+	assert.Contains(t, output, `"message":"from context"`)
+
+	assert.NotPanics(t, func() {
+		ctxLogger.WithOptions(WithLevel(LevelDebug))
+	})
 }
 
 func TestLevelConversions(t *testing.T) {
@@ -108,19 +122,22 @@ func TestLevelConversions(t *testing.T) {
 		level level
 	}{
 		{"trace", LevelTrace},
-		{"debug", LevelDebug},
+		{"DEBUG", LevelDebug},
 		{"info", LevelInfo},
 		{"warn", LevelWarn},
 		{"error", LevelError},
 		{"fatal", LevelFatal},
 		{"panic", LevelPanic},
 		{"unknown", LevelInfo}, // default
+		{"", LevelInfo},        // default
 	}
 
 	for _, tc := range testCases {
-		assert.Equal(t, tc.level, stringToLevel(tc.str), "stringToLevel failed for "+tc.str)
-		if tc.str != "unknown" {
-			assert.Equal(t, tc.str, levelToString(tc.level), "levelToString failed for "+tc.str)
-		}
+		t.Run(tc.str, func(t *testing.T) {
+			assert.Equal(t, tc.level, stringToLevel(tc.str), "stringToLevel failed")
+			if tc.str != "unknown" && tc.str != "" && tc.str != "DEBUG" {
+				assert.Equal(t, tc.str, levelToString(tc.level), "levelToString failed")
+			}
+		})
 	}
 }
