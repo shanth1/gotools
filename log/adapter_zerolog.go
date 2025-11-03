@@ -2,8 +2,6 @@ package log
 
 import (
 	"io"
-	"os"
-	"time"
 
 	"github.com/rs/zerolog"
 )
@@ -48,13 +46,13 @@ func (l *zerologAdapter) With(fields ...Field) Logger {
 }
 
 func (l *zerologAdapter) WithOptions(opts ...option) Logger {
-	newCfg := *l.cfg
+	newCfg := l.cfg.clone()
 
 	for _, opt := range opts {
-		opt(&newCfg)
+		opt(newCfg)
 	}
 
-	return newLoggerWithConfig(&newCfg)
+	return newLoggerWithConfig(newCfg)
 }
 
 // --- Logger ---
@@ -65,6 +63,7 @@ func (l *zerologAdapter) Info() Event  { return &zerologEvent{l.logger.Info()} }
 func (l *zerologAdapter) Warn() Event  { return &zerologEvent{l.logger.Warn()} }
 func (l *zerologAdapter) Error() Event { return &zerologEvent{l.logger.Error()} }
 func (l *zerologAdapter) Fatal() Event { return &zerologEvent{l.logger.Fatal()} }
+func (l *zerologAdapter) Panic() Event { return &zerologEvent{l.logger.Panic()} }
 
 // --- Event ---
 
@@ -92,20 +91,19 @@ func (e *zerologEvent) Msgf(format string, v ...interface{}) {
 
 // --- Constructor ---
 func newLoggerWithConfig(cfg *config) Logger {
-	if len(cfg.writers) == 0 {
-		cfg.writers = append(cfg.writers, zerolog.ConsoleWriter{
-			Out:        os.Stdout,
-			TimeFormat: time.RFC3339,
-		})
-	}
-
 	zlevel, err := zerolog.ParseLevel(levelToString(cfg.level))
 	if err != nil {
 		zlevel = zerolog.InfoLevel
 	}
 
-	multi := zerolog.MultiLevelWriter(cfg.writers...)
-	context := zerolog.New(multi).With().Timestamp()
+	var finalWriter io.Writer
+	if len(cfg.writers) == 1 {
+		finalWriter = cfg.writers[0]
+	} else {
+		finalWriter = zerolog.MultiLevelWriter(cfg.writers...)
+	}
+
+	context := zerolog.New(finalWriter).With().Timestamp()
 
 	if cfg.app != "" {
 		context = context.Str("app", cfg.app)

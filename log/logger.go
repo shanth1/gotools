@@ -24,6 +24,7 @@ type Logger interface {
 	Warn() Event
 	Error() Event
 	Fatal() Event
+	Panic() Event
 	With(fields ...Field) Logger
 	WithOptions(opts ...option) Logger
 }
@@ -57,5 +58,6 @@ type Event interface {
 
 func Str(key, value string) Field             { return Field{key, value} }
 func Int(key string, value int) Field         { return Field{key, value} }
+func Bool(key string, value bool) Field       { return Field{key, value} }
 func Err(err error) Field                     { return Field{"error", err} }
 func Any(key string, value interface{}) Field { return Field{key, value} }

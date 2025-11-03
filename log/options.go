@@ -18,6 +18,13 @@ type config struct {
 	enableCaller bool
 }
 
+func (c *config) clone() *config {
+	newCfg := *c
+	newCfg.writers = make([]io.Writer, len(c.writers))
+	copy(newCfg.writers, c.writers)
+	return &newCfg
+}
+
 // option defines a function for configuring the logger.
 type option func(*config)
 
@@ -45,6 +52,18 @@ func WithConsoleWriter() option {
 	}
 }
 
+// WithStdoutWriter adds os.Stdout as a log writer.
+// Logs will be written to the standard output stream.
+func WithStdoutWriter() option {
+	return WithWriter(os.Stdout)
+}
+
+// WithStderrWriter adds os.Stderr as a log writer.
+// This is the recommended method for outputting logs to the console in JSON format.
+func WithStderrWriter() option {
+	return WithWriter(os.Stderr)
+}
+
 // WithApp adds the app name to all log entries
 func WithApp(app string) option {
 	return func(c *config) {
@@ -67,6 +86,7 @@ func WithCaller() option {
 }
 
 // WithConfig applies all settings from the Config structure.
+// WARNING: This option overwrites all previously installed writers.
 func WithConfig(cfg Config) option {
 	return func(c *config) {
 		if cfg.App != "" {
@@ -88,7 +108,7 @@ func WithConfig(cfg Config) option {
 			WithUDPWriter(cfg.UDPAddress)(c)
 		}
 
-		if cfg.UDPAddress == "" || cfg.Console {
+		if cfg.Console {
 			WithConsoleWriter()(c)
 		}
 	}
