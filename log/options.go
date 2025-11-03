@@ -5,7 +5,6 @@ import (
 	"io"
 	"net"
 	"os"
-	"time"
 
 	"github.com/rs/zerolog"
 )
@@ -46,8 +45,7 @@ func WithWriter(w io.Writer) option {
 func WithConsoleWriter() option {
 	return func(c *config) {
 		c.writers = append(c.writers, zerolog.ConsoleWriter{
-			Out:        os.Stdout,
-			TimeFormat: time.RFC3339,
+			Out: os.Stdout,
 		})
 	}
 }

@@ -2,6 +2,7 @@ package log
 
 import (
 	"io"
+	"time"
 
 	"github.com/rs/zerolog"
 )
@@ -103,22 +104,26 @@ func newLoggerWithConfig(cfg *config) Logger {
 		finalWriter = zerolog.MultiLevelWriter(cfg.writers...)
 	}
 
-	context := zerolog.New(finalWriter).With().Timestamp()
+	zerologContext := zerolog.New(finalWriter).With()
 
 	if cfg.app != "" {
-		context = context.Str("app", cfg.app)
+		zerologContext = zerologContext.Str("app", cfg.app)
 	}
 	if cfg.service != "" {
-		context = context.Str("service", cfg.service)
+		zerologContext = zerologContext.Str("service", cfg.service)
 	}
 	if cfg.enableCaller {
-		context = context.Caller()
+		zerologContext = zerologContext.Caller()
 	}
 
-	logger := context.Logger().Level(zlevel)
+	loggerWithContext := zerologContext.Logger().Level(zlevel)
+	nanoSecondHook := zerolog.HookFunc(func(e *zerolog.Event, level zerolog.Level, message string) {
+		e.Str(zerolog.TimestampFieldName, time.Now().Format(time.RFC3339Nano))
+	})
+	finalLogger := loggerWithContext.Hook(nanoSecondHook).Level(zlevel)
 
 	return &zerologAdapter{
-		logger: logger,
+		logger: finalLogger,
 		cfg:    cfg,
 	}
 }
