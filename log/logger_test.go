@@ -119,7 +119,7 @@ func TestLevelConversions(t *testing.T) {
 	t.Parallel()
 	testCases := []struct {
 		str   string
-		level level
+		level Level
 	}{
 		{"trace", LevelTrace},
 		{"TRACE", LevelTrace},

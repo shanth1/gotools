@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-var levelToStringMap = map[level]string{
+var levelToStringMap = map[Level]string{
 	LevelTrace:    "trace",
 	LevelDebug:    "debug",
 	LevelInfo:     "info",
@@ -17,14 +17,14 @@ var levelToStringMap = map[level]string{
 	LevelDisabled: "disabled",
 }
 
-func levelToString(level level) string {
+func levelToString(level Level) string {
 	if s, ok := levelToStringMap[level]; ok {
 		return s
 	}
 	return "info"
 }
 
-var stringToLevelMap = map[string]level{
+var stringToLevelMap = map[string]Level{
 	"trace":    LevelTrace,
 	"debug":    LevelDebug,
 	"info":     LevelInfo,
@@ -39,7 +39,7 @@ var stringToLevelMap = map[string]level{
 
 // ParseLevel converts a string to a Level.
 // It returns an error if the string is not a valid log level.
-func ParseLevel(lvl string) (level, error) {
+func ParseLevel(lvl string) (Level, error) {
 	if l, ok := stringToLevelMap[strings.ToLower(lvl)]; ok {
 		return l, nil
 	}

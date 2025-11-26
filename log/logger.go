@@ -4,10 +4,10 @@ import (
 	"time"
 )
 
-type level int8
+type Level int8
 
 const (
-	LevelTrace level = iota - 1
+	LevelTrace Level = iota - 1
 	// LevelDebug logs useful for debugging.
 	LevelDebug
 	// LevelInfo logs standard informational messages.
@@ -130,7 +130,7 @@ func RawJSON(key string, value []byte) Field    { return Field{key, value} }
 
 // UnmarshalText implements encoding.TextUnmarshaler (for JSON/YAML decoding).
 // It returns an error if the level string is invalid.
-func (l *level) UnmarshalText(text []byte) error {
+func (l *Level) UnmarshalText(text []byte) error {
 	lvl, err := ParseLevel(string(text))
 	if err != nil {
 		return err

@@ -10,7 +10,7 @@ import (
 )
 
 type config struct {
-	level        level
+	level        Level
 	writers      []io.Writer
 	app          string
 	service      string
@@ -28,7 +28,7 @@ func (c *config) clone() *config {
 type option func(*config)
 
 // WithLevel sets the logging level (debug, info, warn, error).
-func WithLevel(level level) option {
+func WithLevel(level Level) option {
 	return func(c *config) {
 		c.level = level
 	}
