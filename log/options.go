@@ -85,6 +85,7 @@ func WithCaller() option {
 
 // WithConfig applies all settings from the Config structure.
 // WARNING: This option overwrites all previously installed writers.
+// It PANICS if the configured log level is invalid.
 func WithConfig(cfg Config) option {
 	return func(c *config) {
 		if cfg.App != "" {
@@ -94,7 +95,11 @@ func WithConfig(cfg Config) option {
 			c.service = cfg.Service
 		}
 		if cfg.Level != "" {
-			c.level = stringToLevel(cfg.Level)
+			lvl, err := ParseLevel(cfg.Level)
+			if err != nil {
+				panic(fmt.Sprintf("log: failed to configure logger: %v", err))
+			}
+			c.level = lvl
 		}
 		if cfg.EnableCaller {
 			c.enableCaller = true

@@ -127,3 +127,14 @@ func Any(key string, value interface{}) Field   { return Field{key, value} }
 func Bytes(key string, value []byte) Field      { return Field{key, value} }
 func Hex(key string, value []byte) Field        { return Field{key, value} } // Note: With() uses reflection, might log as b64 unless adapter is smart
 func RawJSON(key string, value []byte) Field    { return Field{key, value} }
+
+// UnmarshalText implements encoding.TextUnmarshaler (for JSON/YAML decoding).
+// It returns an error if the level string is invalid.
+func (l *level) UnmarshalText(text []byte) error {
+	lvl, err := ParseLevel(string(text))
+	if err != nil {
+		return err
+	}
+	*l = lvl
+	return nil
+}
