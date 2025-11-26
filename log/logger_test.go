@@ -119,25 +119,35 @@ func TestLevelConversions(t *testing.T) {
 	t.Parallel()
 	testCases := []struct {
 		str   string
-		level level
+		level Level
 	}{
 		{"trace", LevelTrace},
+		{"TRACE", LevelTrace},
+		{"debug", LevelDebug},
 		{"DEBUG", LevelDebug},
 		{"info", LevelInfo},
+		{"INFO", LevelInfo},
 		{"warn", LevelWarn},
+		{"WARN", LevelWarn},
 		{"error", LevelError},
+		{"ERROR", LevelError},
 		{"fatal", LevelFatal},
+		{"FATAL", LevelFatal},
 		{"panic", LevelPanic},
-		{"unknown", LevelInfo}, // default
-		{"", LevelInfo},        // default
+		{"PANIC", LevelPanic},
+		{"disabled", LevelDisabled},
+		{"DISABLED", LevelDisabled},
+		{"off", LevelDisabled},
+		{"OFF", LevelDisabled},
+		{"none", LevelDisabled},
+		{"NONE", LevelDisabled},
 	}
 
 	for _, tc := range testCases {
 		t.Run(tc.str, func(t *testing.T) {
-			assert.Equal(t, tc.level, stringToLevel(tc.str), "stringToLevel failed")
-			if tc.str != "unknown" && tc.str != "" && tc.str != "DEBUG" {
-				assert.Equal(t, tc.str, levelToString(tc.level), "levelToString failed")
-			}
+			level, err := ParseLevel(tc.str)
+			assert.NoError(t, err)
+			assert.Equal(t, tc.level, level, "stringToLevel failed")
 		})
 	}
 }
