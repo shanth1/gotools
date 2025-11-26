@@ -3,13 +3,14 @@ package log
 import "strings"
 
 var levelToStringMap = map[level]string{
-	LevelTrace: "trace",
-	LevelDebug: "debug",
-	LevelInfo:  "info",
-	LevelWarn:  "warn",
-	LevelError: "error",
-	LevelFatal: "fatal",
-	LevelPanic: "panic",
+	LevelTrace:    "trace",
+	LevelDebug:    "debug",
+	LevelInfo:     "info",
+	LevelWarn:     "warn",
+	LevelError:    "error",
+	LevelFatal:    "fatal",
+	LevelPanic:    "panic",
+	LevelDisabled: "disabled",
 }
 
 func levelToString(level level) string {
@@ -20,13 +21,16 @@ func levelToString(level level) string {
 }
 
 var stringToLevelMap = map[string]level{
-	"trace": LevelTrace,
-	"debug": LevelDebug,
-	"info":  LevelInfo,
-	"warn":  LevelWarn,
-	"error": LevelError,
-	"fatal": LevelFatal,
-	"panic": LevelPanic,
+	"trace":    LevelTrace,
+	"debug":    LevelDebug,
+	"info":     LevelInfo,
+	"warn":     LevelWarn,
+	"error":    LevelError,
+	"fatal":    LevelFatal,
+	"panic":    LevelPanic,
+	"disabled": LevelDisabled,
+	"off":      LevelDisabled,
+	"none":     LevelDisabled,
 }
 
 func stringToLevel(level string) level {

@@ -8,12 +8,21 @@ type level int8
 
 const (
 	LevelTrace level = iota - 1
+	// LevelDebug logs useful for debugging.
 	LevelDebug
+	// LevelInfo logs standard informational messages.
 	LevelInfo
+	// LevelWarn logs warnings that doesn't stop the flow.
 	LevelWarn
+	// LevelError logs errors that should be investigated.
 	LevelError
+	// LevelFatal logs fatal errors and CALLS os.Exit(1).
+	// CAUTION: This will terminate the application immediately.
 	LevelFatal
+	// LevelPanic logs the error and CALLS panic().
 	LevelPanic
+	// LevelDisabled disables logging completely.
+	LevelDisabled
 )
 
 type Field struct {
@@ -27,8 +36,8 @@ type Logger interface {
 	Info() Event
 	Warn() Event
 	Error() Event
-	Fatal() Event
-	Panic() Event
+	Fatal() Event // Fatal logs a message at fatal level and then calls os.Exit(1).
+	Panic() Event // Panic logs a message at panic level and then calls panic().
 	With(fields ...Field) Logger
 	WithOptions(opts ...option) Logger
 }

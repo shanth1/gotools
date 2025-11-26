@@ -133,9 +133,17 @@ func (e *zerologEvent) Msgf(format string, v ...interface{}) {
 
 // --- Constructor ---
 func newLoggerWithConfig(cfg *config) Logger {
-	zlevel, err := zerolog.ParseLevel(levelToString(cfg.level))
-	if err != nil {
-		zlevel = zerolog.InfoLevel
+	strLevel := levelToString(cfg.level)
+
+	var zlevel zerolog.Level
+	if cfg.level == LevelDisabled {
+		zlevel = zerolog.Disabled
+	} else {
+		var err error
+		zlevel, err = zerolog.ParseLevel(strLevel)
+		if err != nil {
+			zlevel = zerolog.InfoLevel
+		}
 	}
 
 	var finalWriter io.Writer
