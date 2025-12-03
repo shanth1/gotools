@@ -4,6 +4,7 @@ const (
 	// Environments
 	EnvLocal = "local"
 	EnvDev   = "dev"
+	EnvStage = "stage"
 	EnvProd  = "prod"
 
 	// Statuses
