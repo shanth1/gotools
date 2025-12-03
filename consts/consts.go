@@ -3,8 +3,8 @@ package consts
 const (
 	// Environments
 	EnvLocal = "local"
-	EnvDev   = "development"
-	EnvProd  = "production"
+	EnvDev   = "dev"
+	EnvProd  = "prod"
 
 	// Statuses
 	StatusSuccess = "success"
