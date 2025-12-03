@@ -2,7 +2,6 @@ package env
 
 import (
 	"fmt"
-	"os"
 	"reflect"
 
 	"github.com/ilyakaznacheev/cleanenv"
@@ -10,10 +9,10 @@ import (
 )
 
 // LoadIntoStruct loads data from variables and env file into structure
+// Struct tags example: `env:"TEST"`
 //
-// Priority: VERIABLES > .ENV
-//
-// Example: `env:"TEST"`
+// Priority: System .env > File .env
+// If the path to the file is not specified, only system variables are read.
 func LoadIntoStruct(envPath string, cfgPtr interface{}) error {
 	val := reflect.ValueOf(cfgPtr)
 	if val.Kind() != reflect.Ptr || val.Elem().Kind() != reflect.Struct {
@@ -22,11 +21,7 @@ func LoadIntoStruct(envPath string, cfgPtr interface{}) error {
 
 	if envPath != "" {
 		if err := godotenv.Load(envPath); err != nil {
-			if _, err := os.Stat(envPath); err == nil {
-				if err := godotenv.Load(envPath); err != nil {
-					return fmt.Errorf("load .env file: %w", err)
-				}
-			}
+			return fmt.Errorf("read env file: %w", err)
 		}
 	}
 
