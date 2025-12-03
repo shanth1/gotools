@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/rs/zerolog"
+	"github.com/shanth1/gotools/logkeys"
 )
 
 // zerologAdapter implements the Logger interface
@@ -156,10 +157,10 @@ func newLoggerWithConfig(cfg *config) Logger {
 	zerologContext := zerolog.New(finalWriter).With()
 
 	if cfg.app != "" {
-		zerologContext = zerologContext.Str("app", cfg.app)
+		zerologContext = zerologContext.Str(logkeys.App, cfg.app)
 	}
 	if cfg.service != "" {
-		zerologContext = zerologContext.Str("service", cfg.service)
+		zerologContext = zerologContext.Str(logkeys.Service, cfg.service)
 	}
 	if cfg.enableCaller {
 		zerologContext = zerologContext.Caller()
