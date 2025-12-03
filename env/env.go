@@ -2,6 +2,7 @@ package env
 
 import (
 	"fmt"
+	"os"
 	"reflect"
 
 	"github.com/ilyakaznacheev/cleanenv"
@@ -21,7 +22,11 @@ func LoadIntoStruct(envPath string, cfgPtr interface{}) error {
 
 	if envPath != "" {
 		if err := godotenv.Load(envPath); err != nil {
-			return fmt.Errorf("read env file: %w", err)
+			if _, err := os.Stat(envPath); err == nil {
+				if err := godotenv.Load(envPath); err != nil {
+					return fmt.Errorf("load .env file: %w", err)
+				}
+			}
 		}
 	}
 
