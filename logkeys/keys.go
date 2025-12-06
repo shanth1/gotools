@@ -1,5 +1,13 @@
 package logkeys
 
+// --- Common ---
+const (
+	Metadata = "metadata" // Generic object/map dump
+	Payload  = "payload"  // Request/Message payload dump
+	Raw      = "raw"      // Raw data dump (bytes/string)
+	Tags     = "tags"     // Array of string tags
+)
+
 // --- System, Runtime & Build ---
 const (
 	Env        = "env"        // Environment name (e.g., prod, dev, staging)
@@ -43,6 +51,15 @@ const (
 	BytesIn       = "bytes_in"        // Request body size in bytes
 	BytesOut      = "bytes_out"       // Response body size in bytes
 	ContentType   = "content_type"    // Content-Type header value
+)
+
+// --- WebSockets & Real-time ---
+const (
+	WSConnID  = "ws_conn_id"  // Unique WebSocket connection ID
+	WSChannel = "ws_channel"  // Channel, room, or topic name
+	WSEvent   = "ws_event"    // Event type (connect, disconnect, message)
+	WSMsgType = "ws_msg_type" // Message type (text, binary, ping, pong)
+	WSMsgSize = "ws_msg_size" // Size of the payload
 )
 
 // --- gRPC & RPC ---
@@ -103,6 +120,18 @@ const (
 	Fingerprint = "fingerprint" // Browser or device fingerprint
 )
 
+// --- Security & Audit ---
+const (
+	ClientGeo    = "client_geo"    // Country or region code from IP
+	RiskScore    = "risk_score"    // Fraud/Risk score (0.0 - 1.0)
+	ThreatType   = "threat_type"   // Type of threat (sql_injection, xss, brute_force)
+	AttackVector = "attack_vector" // How the attack was delivered
+	ACLPolicy    = "acl_policy"    // Name of the ACL policy evaluated
+	Permission   = "permission"    // Specific permission checked
+	CipherSuite  = "cipher_suite"  // TLS cipher suite used
+	TLSVersion   = "tls_version"   // TLS version (1.2, 1.3)
+)
+
 // --- Errors & Security ---
 const (
 	Error       = "error"        // String representation of the error
@@ -112,6 +141,14 @@ const (
 	PanicReason = "panic_reason" // Value recovered from a panic
 	Blocked     = "blocked"      // Boolean indicating request was blocked
 	Reason      = "reason"       // Human-readable reason for an action/error
+)
+
+// --- Data Validation ---
+const (
+	Field        = "field"        // Name of the field being validated
+	Constraint   = "constraint"   // Rule that was violated (e.g., required, min_len)
+	InvalidValue = "invalid_val"  // The value that failed validation (sanitize PII!)
+	InputSource  = "input_source" // Source of input (query, body, header)
 )
 
 // --- Messaging & Async (Kafka, RabbitMQ, SQS) ---
@@ -126,6 +163,19 @@ const (
 	WorkerID    = "worker_id"    // ID of the background worker
 	JobType     = "job_type"     // Type of background job
 	JobID       = "job_id"       // Unique job execution ID
+)
+
+// --- Infrastructure, Cloud & Containerization ---
+const (
+	Region      = "region"       // Cloud region (e.g., us-east-1)
+	Zone        = "zone"         // Availability zone
+	Cluster     = "cluster"      // Cluster name
+	Node        = "node"         // Node name or IP
+	Pod         = "pod"          // Kubernetes pod name
+	Namespace   = "namespace"    // Kubernetes namespace
+	Container   = "container"    // Container name
+	ContainerID = "container_id" // Docker/CRI container ID
+	Image       = "image"        // Container image name/tag
 )
 
 // --- Feature Flags & Configuration ---
@@ -148,4 +198,41 @@ const (
 	FilePath = "file_path" // Full path to the file
 	FileSize = "file_size" // Size of the file in bytes
 	FileMode = "file_mode" // File permissions mode
+)
+
+// --- Finance & Transactions ---
+const (
+	Currency     = "currency"     // ISO 4217 currency code (USD, EUR)
+	Amount       = "amount"       // Monetary amount (decimal or minor units)
+	OrderID      = "order_id"     // Unique order identifier
+	PaymentID    = "payment_id"   // Payment gateway transaction ID
+	Subscription = "subscription" // Subscription ID
+	Gateway      = "gateway"      // Payment gateway name (Stripe, PayPal)
+	Wallet       = "wallet"       // Wallet address (crypto) or ID
+)
+
+// --- Notifications (Email, SMS, Push) ---
+const (
+	Recipient  = "recipient"   // Identifier of receiver (masked email/phone)
+	Sender     = "sender"      // Sender identity (e.g., noreply@...)
+	Subject    = "subject"     // Email subject or notification title
+	TemplateID = "template_id" // ID of the template used
+	Channel    = "channel"     // Delivery channel (email, sms, push, slack)
+	DeliveryID = "delivery_id" // ID provided by the delivery provider (SendGrid, Twilio ID)
+)
+
+// --- AI & LLM Operations ---
+const (
+	Model       = "model"       // Model name (e.g., gpt-4, llama-2)
+	TokensIn    = "tokens_in"   // Prompt token count
+	TokensOut   = "tokens_out"  // Completion token count
+	Temperature = "temperature" // Model temperature setting
+	VectorID    = "vector_id"   // ID in vector database
+)
+
+// --- OS & Lifecycle ---
+const (
+	Signal   = "signal"    // OS signal received (SIGINT, SIGTERM)
+	ExitCode = "exit_code" // Process exit code
+	Uptime   = "uptime"    // Application uptime duration
 )
