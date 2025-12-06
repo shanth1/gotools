@@ -33,24 +33,44 @@ const (
 	Sampled  = "sampled"   // Whether this trace is sampled
 )
 
-// --- HTTP Request (Server & Client) ---
+// --- HTTP Request & Response ---
 const (
-	HTTPMethod    = "http_method"     // HTTP request method (GET, POST, etc.)
-	HTTPRoute     = "http_route"      // Registered route template (e.g., /users/:id)
-	HTTPStatus    = "http_status"     // HTTP response status code
-	HTTPPath      = "http_path"       // Actual URL path
-	HTTPHost      = "http_host"       // Host header value
-	HTTPUserAgent = "http_user_agent" // Client user agent string
+	// Basic Identifiers
+	RequestID  = "request_id"  // Unique ID for the HTTP request
+	HTTPMethod = "http_method" // GET, POST, PUT, DELETE, etc.
+	HTTPRoute  = "http_route"  // Matched route template (e.g., "/users/{id}")
+	HTTPProto  = "http_proto"  // Protocol version (HTTP/1.1, HTTP/2)
+	HTTPScheme = "http_scheme" // http or https
+
+	// URL & Path Components
+	HTTPHost  = "http_host"  // Host header (domain.com)
+	HTTPPath  = "http_path"  // Path only (/users/1)
+	HTTPQuery = "http_query" // Query string (sort=asc&q=go) - SANITIZE PII!
+	HTTPUrl   = "http_url"   // Full reconstructed URL
+
+	// Client Info
+	HTTPUserAgent = "http_user_agent" // User-Agent string
 	HTTPReferer   = "http_referer"    // Referer URL
-	HTTPProto     = "http_proto"      // HTTP protocol version (1.1, 2.0)
-	RemoteIP      = "remote_ip"       // IP address of the immediate caller
-	ClientIP      = "client_ip"       // True client IP (usually from X-Forwarded-For)
-	RequestID     = "request_id"      // Unique ID for the HTTP request
-	Latency       = "latency"         // Duration of the operation
-	LatencyMS     = "latency_ms"      // Duration in milliseconds
-	BytesIn       = "bytes_in"        // Request body size in bytes
-	BytesOut      = "bytes_out"       // Response body size in bytes
-	ContentType   = "content_type"    // Content-Type header value
+	RemoteAddr    = "remote_addr"     // Remote addr
+	RemoteIP      = "remote_ip"       // Direct IP connection
+	RemotePort    = "remote_port"     // Client port
+	ClientIP      = "client_ip"       // Best guess IP (X-Real-IP / X-Forwarded-For)
+
+	// Payload & Content
+	ContentType = "content_type" // Content-Type header
+	ContentLen  = "content_len"  // Content-Length header
+	BytesIn     = "bytes_in"     // Body size received
+	BytesOut    = "bytes_out"    // Body size sent
+
+	// Multipart / Uploads
+	UploadFile = "upload_file" // Filename of uploaded file
+	UploadSize = "upload_size" // Size of uploaded file
+
+	// Response & Performance
+	HTTPStatus = "http_status" // Numeric status code (200, 404)
+	Latency    = "latency"     // Duration object/string
+	LatencyMS  = "latency_ms"  // Duration in float milliseconds
+	TTFB       = "ttfb"        // Time To First Byte (advanced profiling)
 )
 
 // --- WebSockets & Real-time ---
