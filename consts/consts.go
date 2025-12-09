@@ -1,27 +1,31 @@
 package consts
 
 // --- Environments ---
+type Environment string
+
 const (
-	EnvLocal  = "local"  // Local development environment
-	EnvDev    = "dev"    // Development server
-	EnvTest   = "test"   // Testing/CI environment
-	EnvQA     = "qa"     // Quality assurance environment
-	EnvStage  = "stage"  // Staging/Pre-production environment
-	EnvProd   = "prod"   // Production environment
-	EnvDocker = "docker" // Running inside a container
+	EnvLocal  Environment = "local"  // Local development environment
+	EnvDev    Environment = "dev"    // Development server
+	EnvTest   Environment = "test"   // Testing/CI environment
+	EnvQA     Environment = "qa"     // Quality assurance environment
+	EnvStage  Environment = "stage"  // Staging/Pre-production environment
+	EnvProd   Environment = "prod"   // Production environment
+	EnvDocker Environment = "docker" // Running inside a container
 )
 
 // --- General Statuses ---
+type Status string
+
 const (
-	StatusSuccess  = "success"    // Generic success status
-	StatusError    = "error"      // Generic error status
-	StatusFail     = "fail"       // Failure (often used in JSend spec)
-	StatusPending  = "pending"    // Operation is waiting to start
-	StatusProcess  = "processing" // Operation is in progress
-	StatusDone     = "done"       // Operation finished
-	StatusCanceled = "canceled"   // Operation was stopped manually
-	StatusSkipped  = "skipped"    // Operation was intentionally skipped
-	StatusUnknown  = "unknown"    // State is not determined
+	StatusSuccess  Status = "success"    // Generic success status
+	StatusError    Status = "error"      // Generic error status
+	StatusFail     Status = "fail"       // Failure (often used in JSend spec)
+	StatusPending  Status = "pending"    // Operation is waiting to start
+	StatusProcess  Status = "processing" // Operation is in progress
+	StatusDone     Status = "done"       // Operation finished
+	StatusCanceled Status = "canceled"   // Operation was stopped manually
+	StatusSkipped  Status = "skipped"    // Operation was intentionally skipped
+	StatusUnknown  Status = "unknown"    // State is not determined
 )
 
 // --- HTTP Headers ---
@@ -40,32 +44,36 @@ const (
 )
 
 // --- Content Types (MIME) ---
+type ContentType string
+
 const (
-	ContentTypeJSON      = "application/json"                  // JSON data
-	ContentTypeXML       = "application/xml"                   // XML data
-	ContentTypeHTML      = "text/html"                         // HTML content
-	ContentTypeText      = "text/plain"                        // Plain text
-	ContentTypeForm      = "application/x-www-form-urlencoded" // Form data
-	ContentTypeMultipart = "multipart/form-data"               // File uploads
-	ContentTypeBinary    = "application/octet-stream"          // Binary data
-	ContentTypePDF       = "application/pdf"                   // PDF documents
-	ContentTypeCSV       = "text/csv"                          // Comma-separated values
-	ContentTypeJS        = "application/javascript"            // JavaScript code
-	ContentTypeCSS       = "text/css"                          // CSS styles
-	ContentTypePNG       = "image/png"                         // PNG image
-	ContentTypeJPEG      = "image/jpeg"                        // JPEG image
-	CharsetUTF8          = "charset=utf-8"                     // Standard UTF-8 charset
+	ContentTypeJSON      ContentType = "application/json"                  // JSON data
+	ContentTypeXML       ContentType = "application/xml"                   // XML data
+	ContentTypeHTML      ContentType = "text/html"                         // HTML content
+	ContentTypeText      ContentType = "text/plain"                        // Plain text
+	ContentTypeForm      ContentType = "application/x-www-form-urlencoded" // Form data
+	ContentTypeMultipart ContentType = "multipart/form-data"               // File uploads
+	ContentTypeBinary    ContentType = "application/octet-stream"          // Binary data
+	ContentTypePDF       ContentType = "application/pdf"                   // PDF documents
+	ContentTypeCSV       ContentType = "text/csv"                          // Comma-separated values
+	ContentTypeJS        ContentType = "application/javascript"            // JavaScript code
+	ContentTypeCSS       ContentType = "text/css"                          // CSS styles
+	ContentTypePNG       ContentType = "image/png"                         // PNG image
+	ContentTypeJPEG      ContentType = "image/jpeg"                        // JPEG image
+	CharsetUTF8          string      = "charset=utf-8"                     // Standard UTF-8 charset
 )
 
 // --- HTTP Methods ---
+type Method string
+
 const (
-	MethodGet     = "GET"     // Retrieve resource
-	MethodPost    = "POST"    // Create resource
-	MethodPut     = "PUT"     // Replace resource
-	MethodPatch   = "PATCH"   // Partial update
-	MethodDelete  = "DELETE"  // Remove resource
-	MethodOptions = "OPTIONS" // Describe communication options
-	MethodHead    = "HEAD"    // GET without body
+	MethodGet     Method = "GET"     // Retrieve resource
+	MethodPost    Method = "POST"    // Create resource
+	MethodPut     Method = "PUT"     // Replace resource
+	MethodPatch   Method = "PATCH"   // Partial update
+	MethodDelete  Method = "DELETE"  // Remove resource
+	MethodOptions Method = "OPTIONS" // Describe communication options
+	MethodHead    Method = "HEAD"    // GET without body
 )
 
 // --- Time & Date Layouts (Go Reference Time: Mon Jan 2 15:04:05 MST 2006) ---
@@ -80,13 +88,15 @@ const (
 )
 
 // --- Authentication & Identity ---
+type Role string
+
 const (
-	AuthSchemeBearer = "Bearer" // Bearer token scheme
-	AuthSchemeBasic  = "Basic"  // Basic auth scheme
-	RoleAdmin        = "admin"  // Administrator role
-	RoleUser         = "user"   // Standard user role
-	RoleGuest        = "guest"  // Unauthenticated user
-	RoleSystem       = "system" // Internal system account
+	AuthSchemeBearer      = "Bearer" // Bearer token scheme
+	AuthSchemeBasic       = "Basic"  // Basic auth scheme
+	RoleAdmin        Role = "admin"  // Administrator role
+	RoleUser         Role = "user"   // Standard user role
+	RoleGuest        Role = "guest"  // Unauthenticated user
+	RoleSystem       Role = "system" // Internal system account
 )
 
 // --- Database & Pagination ---
@@ -98,13 +108,15 @@ const (
 	MaxPageSize     = 100    // Safety limit for page size
 )
 
-// --- Context Keys (Strings mainly used for Middleware <-> Handler) ---
+// --- Context Keys ---
+type contextKey string
+
 const (
-	CtxKeyUserID    = "user_id"    // Context key for User ID
-	CtxKeyRole      = "user_role"  // Context key for User Role
-	CtxKeyRequestID = "request_id" // Context key for Request Trace ID
-	CtxKeyLogger    = "logger"     // Context key to pass logger instance
-	CtxKeyToken     = "auth_token" // Context key for raw token
+	CtxKeyUserID    contextKey = "user_id"    // Context key for User ID
+	CtxKeyRole      contextKey = "user_role"  // Context key for User Role
+	CtxKeyRequestID contextKey = "request_id" // Context key for Request Trace ID
+	CtxKeyLogger    contextKey = "logger"     // Context key to pass logger instance
+	CtxKeyToken     contextKey = "auth_token" // Context key for raw token
 )
 
 // --- Common Symbols & Chars ---
