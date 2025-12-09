@@ -1,16 +1,16 @@
 package consts
 
 // --- Environments ---
-type Environment string
+type Env string
 
 const (
-	EnvLocal  Environment = "local"  // Local development environment
-	EnvDev    Environment = "dev"    // Development server
-	EnvTest   Environment = "test"   // Testing/CI environment
-	EnvQA     Environment = "qa"     // Quality assurance environment
-	EnvStage  Environment = "stage"  // Staging/Pre-production environment
-	EnvProd   Environment = "prod"   // Production environment
-	EnvDocker Environment = "docker" // Running inside a container
+	EnvLocal  Env = "local"  // Local development environment
+	EnvDev    Env = "dev"    // Development server
+	EnvTest   Env = "test"   // Testing/CI environment
+	EnvQA     Env = "qa"     // Quality assurance environment
+	EnvStage  Env = "stage"  // Staging/Pre-production environment
+	EnvProd   Env = "prod"   // Production environment
+	EnvDocker Env = "docker" // Running inside a container
 )
 
 // --- General Statuses ---
