@@ -19,3 +19,4 @@ go get github.com/shanth1/gotools
 - [**`log`**](./log/.md): A structured, leveled logging wrapper around `zerolog`.
 - [**`logkeys`**](./logkeys/.md): Pre-defined constants for logging.
 - [**`notify`**](./notify/.md): Notification services with support for Telegram and Email.
+- [**`ops`**](./ops/.md): Package for structured error handling that attaches operation contexts and typed categories to Go errors.
