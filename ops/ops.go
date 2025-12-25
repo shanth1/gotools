@@ -7,22 +7,42 @@ import (
 type Kind uint8
 
 const (
-	KindOther Kind = iota
-	KindPermission
-	KindNotFound
-	KindInvalid
+	KindOther        Kind = iota
+	KindInvalid           // 400
+	KindUnauthorized      // 401
+	KindPermission        // 403
+	KindNotFound          // 404
+	KindExist             // 409
+	KindInternal          // 500
+	KindUnavailable       // 503
+	KindTimeout           // 504
+	KindNotImplemented
 )
 
 func (k Kind) String() string {
 	switch k {
+	case KindOther:
+		return "other error"
+	case KindInvalid:
+		return "invalid operation"
 	case KindPermission:
 		return "permission denied"
+	case KindUnauthorized:
+		return "unauthorized"
 	case KindNotFound:
 		return "not found"
-	case KindInvalid:
-		return "invalid"
+	case KindExist:
+		return "item already exists"
+	case KindNotImplemented:
+		return "not implemented"
+	case KindUnavailable:
+		return "service unavailable"
+	case KindTimeout:
+		return "operation timeout"
+	case KindInternal:
+		return "internal error"
 	default:
-		return "unknown error"
+		return "unknown error kind"
 	}
 }
 
