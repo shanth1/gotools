@@ -39,6 +39,7 @@ type Logger interface {
 	Fatal() Event // Fatal logs a message at fatal level and then calls os.Exit(1).
 	Panic() Event // Panic logs a message at panic level and then calls panic().
 	With(fields ...Field) Logger
+	WithLevel(level Level) Event
 	WithOptions(opts ...option) Logger
 }
 

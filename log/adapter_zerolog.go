@@ -47,6 +47,13 @@ func (l *zerologAdapter) With(fields ...Field) Logger {
 	}
 }
 
+func (l *zerologAdapter) WithLevel(level Level) Event {
+	zLevel := mapToZerologLevel(level)
+	return &zerologEvent{
+		event: l.logger.WithLevel(zLevel),
+	}
+}
+
 func (l *zerologAdapter) WithOptions(opts ...option) Logger {
 	newCfg := l.cfg.clone()
 
@@ -175,5 +182,29 @@ func newLoggerWithConfig(cfg *config) Logger {
 	return &zerologAdapter{
 		logger: finalLogger,
 		cfg:    cfg,
+	}
+}
+
+// Helper to convert internal Level to zerolog.Level
+func mapToZerologLevel(l Level) zerolog.Level {
+	switch l {
+	case LevelTrace:
+		return zerolog.TraceLevel
+	case LevelDebug:
+		return zerolog.DebugLevel
+	case LevelInfo:
+		return zerolog.InfoLevel
+	case LevelWarn:
+		return zerolog.WarnLevel
+	case LevelError:
+		return zerolog.ErrorLevel
+	case LevelFatal:
+		return zerolog.FatalLevel
+	case LevelPanic:
+		return zerolog.PanicLevel
+	case LevelDisabled:
+		return zerolog.Disabled
+	default:
+		return zerolog.InfoLevel
 	}
 }
