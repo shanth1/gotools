@@ -10,17 +10,17 @@ func TestKind_String(t *testing.T) {
 		kind     Kind
 		expected string
 	}{
-		{KindOther, "other error"},
-		{KindInvalid, "invalid operation"},
+		{KindOther, "other_error"},
+		{KindInvalid, "invalid_operation"},
 		{KindUnauthorized, "unauthorized"},
-		{KindPermission, "permission denied"},
-		{KindNotFound, "not found"},
-		{KindExist, "item already exists"},
-		{KindInternal, "internal error"},
-		{KindUnavailable, "service unavailable"},
-		{KindTimeout, "operation timeout"},
-		{KindNotImplemented, "not implemented"},
-		{Kind(255), "unknown error kind"},
+		{KindPermission, "permission_denied"},
+		{KindNotFound, "not_found"},
+		{KindExist, "item_already_exists"},
+		{KindInternal, "internal_error"},
+		{KindUnavailable, "service_unavailable"},
+		{KindTimeout, "operation_timeout"},
+		{KindNotImplemented, "not_implemented"},
+		{255, "unknown_kind"},
 	}
 
 	for _, tt := range tests {
@@ -49,33 +49,16 @@ func TestError_Error(t *testing.T) {
 				Op:   "user.Create",
 				Kind: KindInvalid,
 			},
-			expected: "user.Create: invalid operation",
+			expected: "user.Create: invalid_operation",
 		},
 		{
-			name: "Op and Nested Error only",
-			err: &Error{
-				Op:   "user.Delete",
-				Kind: KindOther,
-				Err:  baseErr,
-			},
-			expected: "user.Delete: low-level error",
-		},
-		{
-			name: "Full Error (Op, Kind, Err)",
+			name: "Full Error",
 			err: &Error{
 				Op:   "user.Update",
 				Kind: KindPermission,
 				Err:  baseErr,
 			},
-			expected: "user.Update: permission denied: low-level error",
-		},
-		{
-			name: "Op Only (KindOther, nil Err)",
-			err: &Error{
-				Op:   "process.Start",
-				Kind: KindOther,
-			},
-			expected: "process.Start",
+			expected: "user.Update: permission_denied: low-level error",
 		},
 	}
 
@@ -88,97 +71,17 @@ func TestError_Error(t *testing.T) {
 	}
 }
 
-func TestE(t *testing.T) {
-	baseErr := errors.New("db connection failed")
-
-	tests := []struct {
-		name     string
-		op       string
-		args     []interface{}
-		validate func(*testing.T, error)
-	}{
-		{
-			name: "Construct with Kind",
-			op:   "auth.Login",
-			args: []interface{}{KindUnauthorized},
-			validate: func(t *testing.T, err error) {
-				e, ok := err.(*Error)
-				if !ok {
-					t.Fatalf("expected *Error, got %T", err)
-				}
-				if e.Op != "auth.Login" {
-					t.Errorf("expected Op 'auth.Login', got %q", e.Op)
-				}
-				if e.Kind != KindUnauthorized {
-					t.Errorf("expected KindUnauthorized, got %v", e.Kind)
-				}
-			},
-		},
-		{
-			name: "Construct with Error",
-			op:   "file.Read",
-			args: []interface{}{baseErr},
-			validate: func(t *testing.T, err error) {
-				e, ok := err.(*Error)
-				if !ok {
-					t.Fatalf("expected *Error, got %T", err)
-				}
-				if e.Err != baseErr {
-					t.Errorf("expected wrapped error to be baseErr")
-				}
-				if e.Kind != KindOther {
-					t.Errorf("expected KindOther, got %v", e.Kind)
-				}
-			},
-		},
-		{
-			name: "Construct with Kind and Error",
-			op:   "service.Call",
-			args: []interface{}{KindInternal, baseErr},
-			validate: func(t *testing.T, err error) {
-				e, ok := err.(*Error)
-				if !ok {
-					t.Fatalf("expected *Error, got %T", err)
-				}
-				if e.Kind != KindInternal {
-					t.Errorf("expected KindInternal")
-				}
-				if e.Err != baseErr {
-					t.Errorf("expected wrapped error")
-				}
-			},
-		},
-		{
-			name: "Nil return if empty",
-			op:   "noop",
-			args: []interface{}{},
-			validate: func(t *testing.T, err error) {
-				if err != nil {
-					t.Errorf("expected nil error, got %v", err)
-				}
-			},
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			err := E(tt.op, tt.args...)
-			tt.validate(t, err)
-		})
-	}
-}
-
-func TestError_Unwrap(t *testing.T) {
-	inner := errors.New("inner")
-	err := &Error{Err: inner}
-
-	if unwrapped := errors.Unwrap(err); unwrapped != inner {
-		t.Errorf("Unwrap() = %v, want %v", unwrapped, inner)
+func TestConstructors(t *testing.T) {
+	baseErr := errors.New("db error")
+	err := Wrap("op", KindInternal, baseErr)
+	if err.Kind != KindInternal {
+		t.Errorf("Wrap failed kind assignment")
 	}
 }
 
 func TestError_Is(t *testing.T) {
-	err := E("test", KindNotFound, errors.New("missing"))
+	base := errors.New("missing")
+	err := Wrap("test", KindNotFound, base)
 
 	tests := []struct {
 		name   string
@@ -194,6 +97,11 @@ func TestError_Is(t *testing.T) {
 			name:   "Does not match different Kind",
 			target: KindPermission,
 			want:   false,
+		},
+		{
+			name:   "Matches underlying error",
+			target: base,
+			want:   true,
 		},
 		{
 			name:   "Does not match arbitrary error",

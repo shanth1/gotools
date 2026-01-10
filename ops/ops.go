@@ -4,58 +4,63 @@ import (
 	"strings"
 )
 
+// Kind defines the category of the error.
 type Kind uint8
 
 const (
-	KindOther        Kind = iota
-	KindInvalid           // 400
-	KindUnauthorized      // 401
-	KindPermission        // 403
-	KindNotFound          // 404
-	KindExist             // 409
-	KindInternal          // 500
-	KindUnavailable       // 503
-	KindTimeout           // 504
-	KindNotImplemented
+	KindOther          Kind = iota // 0: Unclassified error
+	KindInvalid                    // 1: Invalid operation/input (400)
+	KindUnauthorized               // 2: Auth missing (401)
+	KindPermission                 // 3: Auth present but forbidden (403)
+	KindNotFound                   // 4: Resource not found (404)
+	KindExist                      // 5: Resource conflict (409)
+	KindInternal                   // 6: Internal system error (500)
+	KindUnavailable                // 7: Downstream service unavailable (503)
+	KindTimeout                    // 8: Operation timeout (504)
+	KindNotImplemented             // 9: Not implemented (501)
 )
 
 func (k Kind) String() string {
 	switch k {
 	case KindOther:
-		return "other error"
+		return "other_error"
 	case KindInvalid:
-		return "invalid operation"
-	case KindPermission:
-		return "permission denied"
+		return "invalid_operation"
 	case KindUnauthorized:
 		return "unauthorized"
+	case KindPermission:
+		return "permission_denied"
 	case KindNotFound:
-		return "not found"
+		return "not_found"
 	case KindExist:
-		return "item already exists"
-	case KindNotImplemented:
-		return "not implemented"
-	case KindUnavailable:
-		return "service unavailable"
-	case KindTimeout:
-		return "operation timeout"
+		return "item_already_exists"
 	case KindInternal:
-		return "internal error"
+		return "internal_error"
+	case KindUnavailable:
+		return "service_unavailable"
+	case KindTimeout:
+		return "operation_timeout"
+	case KindNotImplemented:
+		return "not_implemented"
 	default:
-		return "unknown error kind"
+		return "unknown_kind"
 	}
 }
 
+// Error implements the standard error interface for Kind.
 func (k Kind) Error() string {
 	return k.String()
 }
 
+// Error is the canonical domain error.
 type Error struct {
-	Op   string
-	Kind Kind
-	Err  error
+	Op      string
+	Kind    Kind
+	Err     error
+	Message string // Safe message for the user
 }
 
+// Error implements the error interface.
 func (e *Error) Error() string {
 	var b strings.Builder
 	b.WriteString(e.Op)
@@ -73,32 +78,31 @@ func (e *Error) Error() string {
 	return b.String()
 }
 
+// Unwrap allows standard errors.Is/As to work on the underlying error.
 func (e *Error) Unwrap() error {
 	return e.Err
 }
 
+// Is supports checking against a specific Kind using errors.Is(err, ops.KindNotFound).
 func (e *Error) Is(target error) bool {
 	t, ok := target.(Kind)
 	if ok {
 		return e.Kind == t
 	}
+
 	return false
 }
 
-func E(op string, args ...interface{}) error {
-	e := &Error{Op: op}
-	for _, arg := range args {
-		switch arg := arg.(type) {
-		case Kind:
-			e.Kind = arg
-		case error:
-			e.Err = arg
-		}
-	}
+// --- Constructors ---
 
-	if e.Err == nil && e.Kind == KindOther {
-		return nil
-	}
+func New(op string, kind Kind, msg string) *Error {
+	return &Error{Op: op, Kind: kind, Message: msg}
+}
 
-	return e
+func Wrap(op string, kind Kind, err error) *Error {
+	return &Error{Op: op, Kind: kind, Err: err}
+}
+
+func WrapMsg(op string, kind Kind, err error, msg string) *Error {
+	return &Error{Op: op, Kind: kind, Err: err, Message: msg}
 }
